@@ -1,0 +1,28 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+COPY prisma.config.ts ./
+COPY prisma ./prisma/
+RUN npm ci
+
+COPY apps/delivery-worker ./apps/delivery-worker
+COPY libs ./libs
+
+RUN npx prisma generate
+RUN npm run build:delivery-worker
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist/apps/delivery-worker ./dist/apps/delivery-worker
+COPY --from=builder /app/dist/libs ./dist/libs
+COPY --from=builder /app/generated ./generated
+
+CMD ["node", "dist/apps/delivery-worker/main.js"]
+

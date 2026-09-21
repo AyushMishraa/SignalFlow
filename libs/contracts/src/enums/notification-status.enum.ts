@@ -1,0 +1,11 @@
+export enum NotificationStatus {
+  PENDING = 'PENDING',
+  QUEUED = 'QUEUED',
+  PROCESSING = 'PROCESSING',
+  SENT = 'SENT',
+  FAILED = 'FAILED',
+  RETRYING = 'RETRYING',
+  DEAD_LETTERED = 'DEAD_LETTERED',
+  CANCELLED = 'CANCELLED',
+}
+

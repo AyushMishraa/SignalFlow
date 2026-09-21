@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../dist/libs/messaging/tsconfig.lib.tsbuildinfo",
+    "outDir": "../../dist/libs/messaging",
+    "declaration": true
+  },
+  "include": ["src/**/*"]
+}
+

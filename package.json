@@ -6,9 +6,13 @@
     "build": "nest build",
     "build:api-gateway": "nest build api-gateway",
     "build:notification-service": "nest build notification-service",
+    "build:delivery-worker": "nest build delivery-worker",
+    "build:scheduler": "nest build scheduler",
     "start": "nest start",
     "start:api-gateway": "nest start api-gateway --watch",
     "start:notification-service": "nest start notification-service --watch",
+    "start:delivery-worker": "nest start delivery-worker --watch",
+    "start:scheduler": "nest start scheduler --watch",
     "start:dev": "nest start api-gateway --watch",
     "start:debug": "nest start api-gateway --debug --watch",
     "start:prod": "node dist/apps/api-gateway/main",
@@ -83,12 +87,17 @@
     ],
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@nestjs/swagger|@nestjs/axios)/)"
+    ],
     "moduleNameMapper": {
       "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@app/contracts(|/.*)$": "<rootDir>/libs/contracts/src/$1",
       "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
       "^@app/logging(|/.*)$": "<rootDir>/libs/logging/src/$1",
-      "^@app/database(|/.*)$": "<rootDir>/libs/database/src/$1"
+      "^@app/database(|/.*)$": "<rootDir>/libs/database/src/$1",
+      "^@app/messaging(|/.*)$": "<rootDir>/libs/messaging/src/$1",
+      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1"
     }
   }
 }

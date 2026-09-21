@@ -16,14 +16,22 @@ export class ResponseInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
 
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        data,
-        meta: {
-          requestId: request.requestId,
-          correlationId: request.correlationId,
-        },
-      })),
+      map((data) => {
+        // If data is already formatted with success and meta (e.g. from downstream proxy), pass through or wrap
+        if (data && typeof data === 'object' && 'success' in data && 'data' in data) {
+          return data;
+        }
+
+        return {
+          success: true,
+          data: data ?? null,
+          meta: {
+            requestId: request.requestId || 'unknown',
+            correlationId: request.correlationId || 'unknown',
+            timestamp: new Date().toISOString(),
+          },
+        };
+      }),
     );
   }
 }

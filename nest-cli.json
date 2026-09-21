@@ -28,6 +28,24 @@
         "tsConfigPath": "apps/notification-service/tsconfig.app.json"
       }
     },
+    "delivery-worker": {
+      "type": "application",
+      "root": "apps/delivery-worker",
+      "entryFile": "main",
+      "sourceRoot": "apps/delivery-worker/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/delivery-worker/tsconfig.app.json"
+      }
+    },
+    "scheduler": {
+      "type": "application",
+      "root": "apps/scheduler",
+      "entryFile": "main",
+      "sourceRoot": "apps/scheduler/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/scheduler/tsconfig.app.json"
+      }
+    },
     "common": {
       "type": "library",
       "root": "libs/common",
@@ -71,6 +89,24 @@
       "sourceRoot": "libs/database/src",
       "compilerOptions": {
         "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "messaging": {
+      "type": "library",
+      "root": "libs/messaging",
+      "entryFile": "index",
+      "sourceRoot": "libs/messaging/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/messaging/tsconfig.lib.json"
+      }
+    },
+    "redis": {
+      "type": "library",
+      "root": "libs/redis",
+      "entryFile": "index",
+      "sourceRoot": "libs/redis/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/redis/tsconfig.lib.json"
       }
     }
   }
