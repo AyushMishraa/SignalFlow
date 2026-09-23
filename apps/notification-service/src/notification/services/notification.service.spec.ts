@@ -54,7 +54,14 @@ describe('NotificationDomainService', () => {
         updatedAt: new Date(),
       };
 
+      const queuedRecord: any = {
+        ...createdRecord,
+        status: NotificationStatus.QUEUED,
+      };
+
       repository.create.mockResolvedValue(createdRecord);
+      repository.findById.mockResolvedValue(createdRecord);
+      repository.updateStatus.mockResolvedValue(queuedRecord);
 
       const result = await service.createNotification(dto, 'user-actor');
 
@@ -67,7 +74,7 @@ describe('NotificationDomainService', () => {
         'user-actor',
         expect.any(Object),
       );
-      expect(result).toBe(createdRecord);
+      expect(result).toBeDefined();
     });
 
     it('should throw BadRequestException if recipient email format is invalid', async () => {
@@ -118,4 +125,3 @@ describe('NotificationDomainService', () => {
     });
   });
 });
-

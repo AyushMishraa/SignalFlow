@@ -3,6 +3,7 @@ import { NotificationChannel } from '@app/contracts';
 import { INotificationProvider } from './provider.interface';
 import { MockEmailProvider } from './email/mock-email.provider';
 import { SesEmailProvider } from './email/ses.provider';
+import { NodemailerEmailProvider } from './email/nodemailer.provider';
 import { MockSmsProvider } from './sms/mock-sms.provider';
 import { SnsSmsProvider } from './sms/sns.provider';
 import { MockPushProvider } from './push/mock-push.provider';
@@ -14,6 +15,7 @@ export class ProviderRegistry {
   private readonly providers = new Map<NotificationChannel, INotificationProvider[]>();
 
   constructor(
+    nodemailerEmail: NodemailerEmailProvider,
     mockEmail: MockEmailProvider,
     sesEmail: SesEmailProvider,
     mockSms: MockSmsProvider,
@@ -22,6 +24,7 @@ export class ProviderRegistry {
     apnsPush: ApnsPushProvider,
   ) {
     this.register(NotificationChannel.EMAIL, [mockEmail, sesEmail]);
+    this.register(NotificationChannel.EMAIL, [nodemailerEmail, mockEmail, sesEmail]);
     this.register(NotificationChannel.SMS, [mockSms, snsSms]);
     this.register(NotificationChannel.PUSH, [mockPush, apnsPush]);
   }

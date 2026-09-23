@@ -3,6 +3,7 @@ import {
   Inject,
   NotFoundException,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import {
   CreateNotificationDto,
@@ -19,6 +20,8 @@ import {
 import { TenantVerificationService } from './tenant-verification.service';
 import { RecipientValidator } from '../domain/recipient-validator';
 import { NotificationStateMachine } from '../domain/notification-state-machine';
+import { OutboxService } from '../../outbox/outbox.service';
+import { NotificationQueuedPayload } from '@app/messaging';
 
 @Injectable()
 export class NotificationDomainService {
@@ -28,6 +31,8 @@ export class NotificationDomainService {
     @Inject(NOTIFICATION_REPOSITORY_TOKEN)
     private readonly repository: INotificationRepository,
     private readonly tenantService: TenantVerificationService,
+    @Optional()
+    private readonly outboxService?: OutboxService,
   ) {}
 
   async createNotification(
@@ -44,11 +49,11 @@ export class NotificationDomainService {
     // 2. Validate recipient format for given channel
     RecipientValidator.validate(dto.channel, dto.recipient);
 
-    // 3. Persist notification in database
+    // 3. Persist notification in database with initial status PENDING
     const initialStatus = NotificationStatus.PENDING;
     const notification = await this.repository.create(dto, initialStatus);
 
-    // 4. Record audit log
+    // 4. Record audit log for creation
     await this.repository.createAuditLog(
       dto.tenantId,
       notification.id,
@@ -63,6 +68,46 @@ export class NotificationDomainService {
     );
 
     this.logger.log(`Notification created with ID: ${notification.id}`);
+
+    // 5. If immediate notification (not scheduled for future), transition to QUEUED and dispatch to Outbox/Queue
+    const isFutureScheduled =
+      dto.scheduledAt && new Date(dto.scheduledAt).getTime() > Date.now();
+
+    if (!isFutureScheduled) {
+      const queuedNotification = await this.transitionStatus(
+        notification.id,
+        NotificationStatus.QUEUED,
+        actor,
+        { reason: 'Auto-queued for asynchronous delivery' },
+      );
+
+      if (this.outboxService) {
+        const payload: NotificationQueuedPayload = {
+          notificationId: notification.id,
+          tenantId: dto.tenantId,
+          type: dto.type,
+          channel: dto.channel,
+          recipient: dto.recipient,
+          subject: dto.subject,
+          content: dto.content,
+          priority: dto.priority || ('NORMAL' as any),
+          attemptNumber: 1,
+          scheduledAt: dto.scheduledAt ?? null,
+        };
+
+        const routingKey = `notification.delivery.${dto.channel.toLowerCase()}`;
+        await this.outboxService.createOutboxEvent(
+          dto.tenantId,
+          'notification.queued',
+          routingKey,
+          payload,
+          notification.id,
+        );
+      }
+
+      return queuedNotification;
+    }
+
     return notification;
   }
 
@@ -153,4 +198,3 @@ export class NotificationDomainService {
     return this.repository.findDeliveryAttempts(id);
   }
 }
-

@@ -5,4 +5,5 @@ export default registerAs('apiGateway', () => ({
   notificationServiceUrl:
     process.env.NOTIFICATION_SERVICE_URL ??
     'http://localhost:3001',
+  timeout: parseInt(process.env.NOTIFICATION_SERVICE_TIMEOUT ?? '30000', 10),
 }));

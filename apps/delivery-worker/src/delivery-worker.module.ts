@@ -5,6 +5,7 @@ import { DatabaseModule } from '@app/database';
 import { MessagingModule } from '@app/messaging';
 import { MockEmailProvider } from './providers/email/mock-email.provider';
 import { SesEmailProvider } from './providers/email/ses.provider';
+import { NodemailerEmailProvider } from './providers/email/nodemailer.provider';
 import { MockSmsProvider } from './providers/sms/mock-sms.provider';
 import { SnsSmsProvider } from './providers/sms/sns.provider';
 import { MockPushProvider } from './providers/push/mock-push.provider';
@@ -22,6 +23,7 @@ import { NotificationConsumer } from './consumers/notification.consumer';
     MessagingModule,
   ],
   providers: [
+    NodemailerEmailProvider,
     MockEmailProvider,
     SesEmailProvider,
     MockSmsProvider,
@@ -33,7 +35,7 @@ import { NotificationConsumer } from './consumers/notification.consumer';
     DeliveryService,
     NotificationConsumer,
   ],
-  exports: [DeliveryService, ProviderRegistry],
+  exports: [DeliveryService, ProviderRegistry, NodemailerEmailProvider],
 })
 export class DeliveryWorkerModule {}
 

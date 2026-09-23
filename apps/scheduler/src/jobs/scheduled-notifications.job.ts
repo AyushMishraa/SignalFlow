@@ -45,13 +45,20 @@ export class ScheduledNotificationsJob implements OnModuleInit, OnModuleDestroy 
     try {
       const now = new Date();
 
-      // Find due pending notifications
+      // Find due pending notifications (future scheduled that are now due OR pending immediate notifications)
       const dueNotifications = await this.prisma.notification.findMany({
         where: {
           status: NotificationStatus.PENDING as any,
-          scheduledAt: {
-            lte: now,
-          },
+          OR: [
+            {
+              scheduledAt: {
+                lte: now,
+              },
+            },
+            {
+              scheduledAt: null,
+            },
+          ],
         },
         take: 50,
       });
@@ -123,4 +130,3 @@ export class ScheduledNotificationsJob implements OnModuleInit, OnModuleDestroy 
     return processedCount;
   }
 }
-

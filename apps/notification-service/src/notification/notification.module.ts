@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@app/database';
+import { OutboxModule } from '../outbox/outbox.module';
 import { NotificationDomainController } from './controllers/notification.controller';
 import { NotificationDomainService } from './services/notification.service';
 import { TenantVerificationService } from './services/tenant-verification.service';
@@ -7,7 +8,7 @@ import { NotificationRepository } from './repositories/notification.repository';
 import { NOTIFICATION_REPOSITORY_TOKEN } from './repositories/notification.repository.interface';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, OutboxModule],
   controllers: [NotificationDomainController],
   providers: [
     NotificationDomainService,
@@ -21,4 +22,3 @@ import { NOTIFICATION_REPOSITORY_TOKEN } from './repositories/notification.repos
   exports: [NotificationDomainService, NOTIFICATION_REPOSITORY_TOKEN],
 })
 export class NotificationModule {}
-
